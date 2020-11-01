@@ -1,8 +1,35 @@
-const createMap = async (geoData) => {
-  const width = 500;
-  const height = 500;
+const width = 500;
+const height = 500;
+
+const getProjection = (geoData) => {
   const projection = d3.geoMercator().fitSize([width, height], geoData);
+  return projection;
+};
+
+const getGeoPaths = (geoData) => {
+  const projection = getProjection(geoData);
   const geoPaths = d3.geoPath().projection(projection);
+  return geoPaths;
+};
+
+const addMapMarkers = (svg, geoData, data) => {
+  const projection = getProjection(geoData);
+
+  svg
+    .append("g")
+    .selectAll("g")
+    .data(data)
+    .enter()
+    .append("g")
+    .attr("transform", function (d) {
+      return "translate(" + projection([d.longitude, d.latitude]) + ")";
+    })
+    .append("circle")
+    .attr("r", 1);
+};
+
+const createMap = async (geoData, data) => {
+  const geoPaths = getGeoPaths(geoData);
   const mapContainer = d3
     .select("#map")
     .style("height", `${height}px`)
@@ -35,6 +62,8 @@ const createMap = async (geoData) => {
     .attr("fill", "blue")
     .attr("opacity", 0.3)
     .attr("stroke", "blue");
+
+  addMapMarkers(mapGroup, geoData, data);
 
   let zoom = d3
     .zoom()
