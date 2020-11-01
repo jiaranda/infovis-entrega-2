@@ -1,5 +1,14 @@
 const loadCSV = async (path) => {
-  return await d3.csv(path);
+  const rawData = await d3.csv(path);
+  const data = [];
+  rawData.forEach((item) => {
+    const existingObject = data.find((elem) => {
+      return elem.id == item.id;
+    });
+    if (existingObject) return;
+    data.push(item);
+  });
+  return data;
 };
 
 const loadJSON = async (path) => {
