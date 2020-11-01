@@ -5,7 +5,7 @@ const colorPalette = {
   mapStroke: "#457B9D",
   dataMin: "#F1FAEE",
   dataMax: "#E63946",
-  categoricalDataPalette: d3.schemeSet3,
+  categoricalDataPalette: d3.schemePastel1,
 };
 
 const getProjection = (geoData) => {
