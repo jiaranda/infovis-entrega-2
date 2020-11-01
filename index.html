@@ -10,6 +10,7 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
     <script src="data.js"></script>
     <script src="map.js"></script>
     <title>Entrega 3 Javier Aranda</title>
@@ -25,7 +26,31 @@
           <div class="subcontent">
             <h1 class="title">Mapa Airbnb</h1>
           </div>
-          <div class="subcontent" id="map"></div>
+          <div class="subcontent" id="map">
+            <div class="buttonsContainer">
+              <button
+                id="price-button"
+                class="selected"
+                onclick="changeColSelector('price')"
+              >
+                Precio
+              </button>
+              <button
+                id="reviews-button"
+                class="notSelected"
+                onclick="changeColSelector('reviews')"
+              >
+                Número de Reviews
+              </button>
+              <button
+                id="roomType-button"
+                class="notSelected"
+                onclick="changeColSelector('roomType')"
+              >
+                Tipo de Pieza
+              </button>
+            </div>
+          </div>
 
           <div class="subcontent">
             <h1 class="title">Decisiones de Diseño</h1>

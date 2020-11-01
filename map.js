@@ -5,6 +5,7 @@ const colorPalette = {
   mapStroke: "#457B9D",
   dataMin: "#F1FAEE",
   dataMax: "#E63946",
+  categoricalDataPalette: d3.schemeSet3,
 };
 
 const getProjection = (geoData) => {
@@ -18,17 +19,27 @@ const getGeoPaths = (geoData) => {
   return geoPaths;
 };
 
-const getColorMap = (data, dataColumn) => {
-  const max = d3.max(data, function (d) {
-    return d[dataColumn];
-  });
-  const min = d3.min(data, function (d) {
-    return d[dataColumn];
-  });
-  const colors = d3
-    .scaleLinear()
-    .domain([0, max])
-    .range([colorPalette.dataMin, colorPalette.dataMax]);
+const getColorMap = (data, dataColumn, categorical = false) => {
+  let colors;
+  if (!categorical) {
+    const max = d3.max(data, function (d) {
+      return d[dataColumn];
+    });
+    const min = d3.min(data, function (d) {
+      return d[dataColumn];
+    });
+    colors = d3
+      .scaleLinear()
+      .domain([min, max])
+      .range([colorPalette.dataMin, colorPalette.dataMax]);
+  } else {
+    const domainData = data.map((item) => item[dataColumn]);
+    colors = d3
+      .scaleOrdinal()
+      .domain(domainData)
+      .range(colorPalette.categoricalDataPalette);
+  }
+
   return colors;
 };
 
@@ -42,6 +53,7 @@ const addMapMarkers = (svg, geoData, data, dataColumn) => {
     .data(data)
     .enter()
     .append("g")
+    .attr("class", "mapMarkers")
     .attr("transform", function (d) {
       return "translate(" + projection([d.longitude, d.latitude]) + ")";
     })
@@ -54,7 +66,7 @@ const createMap = async (geoData, data, dataColumn) => {
   const geoPaths = getGeoPaths(geoData);
   const mapContainer = d3
     .select("#map")
-    .style("height", `${height}px`)
+    // .style("height", `${height + 100}px`)
     .style("width", `${width}px`);
 
   const svg = d3
@@ -105,4 +117,11 @@ const createMap = async (geoData, data, dataColumn) => {
   mapContainer.call(zoom);
 
   return svg;
+};
+
+const updateMarkerColors = (data, newCol, categorical = false) => {
+  const colors = getColorMap(data, newCol, categorical);
+  d3.selectAll(".mapMarkers")
+    .selectAll("circle")
+    .attr("fill", (d) => colors(d[newCol]));
 };
