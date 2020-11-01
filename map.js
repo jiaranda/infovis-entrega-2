@@ -1,5 +1,11 @@
 const width = 500;
 const height = 500;
+const colorPalette = {
+  mapFill: "#1D3557",
+  mapStroke: "#457B9D",
+  dataMin: "#F1FAEE",
+  dataMax: "#E63946",
+};
 
 const getProjection = (geoData) => {
   const projection = d3.geoMercator().fitSize([width, height], geoData);
@@ -12,7 +18,22 @@ const getGeoPaths = (geoData) => {
   return geoPaths;
 };
 
-const addMapMarkers = (svg, geoData, data) => {
+const getColorMap = (data, dataColumn) => {
+  const max = d3.max(data, function (d) {
+    return d[dataColumn];
+  });
+  const min = d3.min(data, function (d) {
+    return d[dataColumn];
+  });
+  const colors = d3
+    .scaleLinear()
+    .domain([0, max])
+    .range([colorPalette.dataMin, colorPalette.dataMax]);
+  return colors;
+};
+
+const addMapMarkers = (svg, geoData, data, dataColumn) => {
+  const colors = getColorMap(data, dataColumn);
   const projection = getProjection(geoData);
 
   svg
@@ -25,10 +46,11 @@ const addMapMarkers = (svg, geoData, data) => {
       return "translate(" + projection([d.longitude, d.latitude]) + ")";
     })
     .append("circle")
-    .attr("r", 1);
+    .attr("r", 1)
+    .attr("fill", (d) => colors(d[dataColumn]));
 };
 
-const createMap = async (geoData, data) => {
+const createMap = async (geoData, data, dataColumn) => {
   const geoPaths = getGeoPaths(geoData);
   const mapContainer = d3
     .select("#map")
@@ -59,11 +81,11 @@ const createMap = async (geoData, data) => {
     .enter()
     .append("path")
     .attr("d", geoPaths)
-    .attr("fill", "blue")
-    .attr("opacity", 0.3)
-    .attr("stroke", "blue");
+    .attr("fill", colorPalette.mapFill)
+    .attr("opacity", 0.9)
+    .attr("stroke", colorPalette.mapStroke);
 
-  addMapMarkers(mapGroup, geoData, data);
+  addMapMarkers(mapGroup, geoData, data, dataColumn);
 
   let zoom = d3
     .zoom()
