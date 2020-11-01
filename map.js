@@ -58,7 +58,7 @@ const addMapMarkers = (svg, geoData, data, dataColumn) => {
       return "translate(" + projection([d.longitude, d.latitude]) + ")";
     })
     .append("circle")
-    .attr("r", 1)
+    .attr("r", 0.5)
     .attr("fill", (d) => colors(d[dataColumn]));
 };
 
